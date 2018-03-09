@@ -11,7 +11,7 @@ import Backbone from 'backbone';
     
     testModel();
 
-
+    testView();
   }
 
   function testModel() {
@@ -49,5 +49,9 @@ import Backbone from 'backbone';
     console.log('todo_2.hasChanged() :', todo_2.hasChanged());
     console.log('todo_2.hasChanged("title") :', todo_2.hasChanged("title"));
     console.log('todo_2.hasChanged("completed") :', todo_2.hasChanged("completed"));
+  }
+
+  function testView() {
+    // see babkbone.js book 39p
   }
 }($));
