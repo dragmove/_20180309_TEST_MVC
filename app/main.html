@@ -18,8 +18,16 @@
 </head>
 
 <body>
-<div id="wrapper"></div>
+<div id="todo"></div>
 
+
+<script type="text/template" id="item-template">
+    <div>
+        <input id="todo-complete" type="checkbox" <%= completed ? 'checked="checked"' : '' %>>
+        <%= title %>
+    </div>
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="main.js" charset="utf-8"></script>
 </body>
 </html>
