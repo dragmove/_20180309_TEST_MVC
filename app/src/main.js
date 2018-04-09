@@ -2,6 +2,8 @@ import $ from 'jquery';
 import Backbone from 'backbone';
 import _ from 'underscore';
 
+import Rx from 'rxjs/Rx';
+
 (function ($) {
   'use strict';
 
@@ -9,11 +11,21 @@ import _ from 'underscore';
 
   function init() {
     console.log('init');
-    
+
+    testRxJS();
+    testBackbone();
+  }
+
+  function testRxJS() {
+    // TODO: test subscribe model.
+    const source$ = Rx.Observable.fromEvent(window, 'resize');
+    const debounce$ = source$.debounceTime(1000);
+    const subscribe$ = debounce$.subscribe(val => console.log(val));
+  }
+
+  function testBackbone() {
     testModel();
-
     testView();
-
     testCollection();
   }
 
@@ -24,10 +36,10 @@ import _ from 'underscore';
         completed: false
       },
 
-      initialize: function() {
+      initialize: function () {
         console.log('initialize Todo :', this);
 
-        this.on('change', function() {
+        this.on('change', function () {
           console.log('model has changed :', this.attributes);
         });
       }
@@ -59,7 +71,7 @@ import _ from 'underscore';
     // see babkbone.js book 39p
 
     let TodoView = Backbone.View.extend({
-      initialize: function() {
+      initialize: function () {
         this.model.bind('change', _.bind(this.render, this));
       },
 
@@ -74,7 +86,7 @@ import _ from 'underscore';
         'blur .edit': 'close'
       },
 
-      render: function() {
+      render: function () {
         this.$el.html(this.todoTpl(this.model.toJSON()));
 
         this.input = this.$('.edit');
@@ -82,15 +94,15 @@ import _ from 'underscore';
         return this;
       },
 
-      edit: function() {
+      edit: function () {
         console.log('edit');
       },
 
-      close: function() {
+      close: function () {
         console.log('close');
       },
 
-      updateOnEnter: function(event) {
+      updateOnEnter: function (event) {
         console.log('updateOnEnter:', event);
       }
     });
@@ -98,7 +110,7 @@ import _ from 'underscore';
     let ItemView = Backbone.View.extend({
       events: {},
 
-      render: function() {
+      render: function () {
         this.$el.html(this.model.toJSON());
 
         return this;
@@ -106,12 +118,12 @@ import _ from 'underscore';
     });
 
     let ListView = Backbone.View.extend({
-      render: function() {
+      render: function () {
         let items = this.model.get('items');
 
-        _.each(items, function(item) {
-          let itemView = new ItemView({ model: item });
-          this.$el.append( itemView.render().el );
+        _.each(items, function (item) {
+          let itemView = new ItemView({model: item});
+          this.$el.append(itemView.render().el);
         });
 
         this.$el.html(this.model.toJSON());
@@ -138,15 +150,15 @@ import _ from 'underscore';
       c = new Todo({title: 'go to shop', id: 3});
 
     var todos = new TodosCollection([a, b]);
-    todos.on('add', function(todo) {
+    todos.on('add', function (todo) {
       console.log('added Todo title :', todo.get('title'))
     });
 
-    todos.on('change:title', function(model) {
+    todos.on('change:title', function (model) {
       console.log(`changed Todo model's title :`, model.get('title'));
     });
 
-    todos.on('remove', function(model) {
+    todos.on('remove', function (model) {
       console.log(`removed Todo model's title :`, model.get('title'));
     });
 
