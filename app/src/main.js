@@ -138,13 +138,25 @@ import _ from 'underscore';
       c = new Todo({title: 'go to shop', id: 3});
 
     var todos = new TodosCollection([a, b]);
-    console.log('todos.length :', todos.length);
+    todos.on('add', function(todo) {
+      console.log('added Todo title :', todo.get('title'))
+    });
+
+    todos.on('change:title', function(model) {
+      console.log(`changed Todo model's title :`, model.get('title'));
+    });
+
+    todos.on('remove', function(model) {
+      console.log(`removed Todo model's title :`, model.get('title'));
+    });
 
     todos.add(c);
-    console.log('todos.length :', todos.length);
+    console.log('after add new Todo, todos.length :', todos.length);
 
     let todo_2 = todos.get(2);
     console.log('todo_2 :', todo_2);
+
+    todo_2.set('title', 'go fishing');
 
     let todoCid = todos.get(todo_2.cid);
     console.log('todoCid :', todoCid);
@@ -152,5 +164,7 @@ import _ from 'underscore';
 
     todos.remove([a, b]);
     console.log('todos.length :', todos.length);
+
+    // reset, update event
   }
 }($));
