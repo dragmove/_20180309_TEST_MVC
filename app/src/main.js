@@ -2,6 +2,8 @@ import $ from 'jquery';
 import Backbone from 'backbone';
 import _ from 'underscore';
 
+import { merge } from 'rxjs/operators';
+import { interval } from 'rxjs/observable/interval';
 import Rx from 'rxjs/Rx';
 
 (function ($) {
@@ -17,10 +19,70 @@ import Rx from 'rxjs/Rx';
   }
 
   function testRxJS() {
-    // TODO: test subscribe model.
-    const source$ = Rx.Observable.fromEvent(window, 'resize');
-    const debounce$ = source$.debounceTime(1000);
-    const subscribe$ = debounce$.subscribe(val => console.log(val));
+    // test RxJS Subject. subscribe change state by action (redux)
+
+    const defaultState = {
+      width: 0,
+      height: 0
+    };
+
+    function factory(reducerByType, initialState) {
+      const action$ = new Rx.Subject();
+
+      const state$ = action$
+        .startWith(initialState)
+        .scan((state, action) => {
+          if (reducerByType.hasOwnProperty(action.type)) return reducerByType[action.type](state, action);
+
+          return state;
+        })
+        .distinctUntilChanged();
+
+      return {
+        action$,
+        state$,
+        dispatch: action => action$.next(action)
+      }
+    }
+
+    const {state$, dispatch} = factory({
+      ADD: (state, action) => {
+        return Object.assign({}, state, {
+          width: action.width,
+          height: action.height
+        });
+      },
+
+      SUBTRACT: (state, action) => {
+        return Object.assign({}, state, {
+          width: action.width,
+          height: action.height
+        });
+      }
+    }, defaultState);
+
+    state$.subscribe(val => {
+      console.log('val :', val);
+    });
+
+    dispatch({
+      type: 'ADD',
+      width: 10,
+      height: 20
+    });
+
+    dispatch({
+      type: 'SUBTRACT',
+      width: 15,
+      height: 20
+    });
+
+
+    /*
+     const source$ = Rx.Observable.fromEvent(window, 'resize');
+     const debounce$ = source$.debounceTime(1000);
+     const subscribe$ = debounce$.subscribe(val => console.log(val));
+     */
   }
 
   function testBackbone() {
