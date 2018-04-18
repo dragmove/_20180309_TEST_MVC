@@ -1,10 +1,9 @@
 import $ from 'jquery';
 
-import { state } from './redux/state';
-import { INCREMENT, DECREMENT, KEY_UP } from './redux/actionTypes';
 import { createStore, combineReducers } from 'redux';
-import { countReducer, keyHistoryReducer } from './redux/reducers';
-import {increment, decrement, keyUp} from './redux/actions';
+import { state } from './redux/state';
+import { visibilityFilter, todos } from './redux/reducers';
+import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions';
 
 
 import Backbone from 'backbone';
@@ -27,110 +26,26 @@ import Rx from 'rxjs/Rx';
     // testBackbone();
   }
 
-  function createReducer(initialState, handlers) {
-    return function reducer(state = initialState, action) {
-      if (handlers.hasOwnProperty(action.type)) {
-        return handlers[action.type](state, action);
-
-      } else {
-        return state
-      }
-    }
-  }
-
   function testRedux() {
-    const countIndexReducer = createReducer(0, {
-      'INCREMENT' : countReducer,
-      'DECREMENT' : countReducer
+    const todoAppReducer = combineReducers({
+      visibilityFilter,
+      todos
     });
 
-    const keyCodesReducer = createReducer('', {
-      'KEY_UP': keyHistoryReducer
-    });
+    let store = createStore(todoAppReducer);
 
-    /*
-    function appReducer(state = initialState, action) {
-      return {
-        count : countR(state.index, action),
-        keyUp : keyR(state.keyCodes, action)
-      };
-    }
-    */
-    let appReducer = combineReducers({
-      index : countIndexReducer,
-      keyCodes : keyCodesReducer
-    });
-
-    let store = createStore(countReducer);
+    console.log('store.getState() :', store.getState());
 
     let unsubscribeStore = store.subscribe(() => {
       console.log('store.getState() :', store.getState());
 
       // render view
-      // renderView(store.getState());
     });
 
     // dispatch event
-    store.dispatch(increment(store.getState().index));
-
-    store.dispatch(increment(store.getState().index));
-
-    store.dispatch(keyUp('enter'));
-
-
-    /*
-     $('body').on('mousemove', function(evt) {
-     store.dispatch(increment(store.getState().index))
-     });
-
-     $('body').on('click', function(evt) {
-     store.dispatch(decrement(store.getState().index))
-     });
-
-     $('body').on('keyup', function(evt) {
-     console.log('evt :', evt);
-
-
-     //store.dispatch(keyUp(store.getState().index))
-
-     });
-     */
-
-    function renderView(state) {
-      if (state) $('#wrap-test-redux').text(state.index);
-    }
-
-    /*
-     function createReducer(initialState, handlers) {
-     return function reducer(state = initialState, action) {
-     if (handlers.hasOwnProperty(action.type)) {
-     return handlers[action.type](state, action);
-
-     } else {
-     return state;
-     }
-     }
-     }
-
-     function countReducer(state, action) {
-     if (typeof state === 'undefined') return initialState;
-
-     switch (action.type) {
-     case 'INCREMENT' :
-     return updateObject(state, {
-     index: state.index + 1
-     });
-
-     case 'DECREMENT' :
-     return updateObject(state, {
-     index: state.index - 1
-     });
-
-     default :
-     return state;
-     }
-     }
-     */
+    store.dispatch(addTodo('Learn about action'));
+    store.dispatch(addTodo('Learn about reducers'));
+    store.dispatch(addTodo('Learn about store'));
   }
 
   function testRxJS() {

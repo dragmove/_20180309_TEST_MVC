@@ -1,22 +1,22 @@
-import { INCREMENT, DECREMENT, KEY_UP } from './actionTypes';
+import { ADD_TODO, COMPLETE_TODO, SET_VISIBILITY_FILTER } from './actionTypes';
 
-export function increment(index) {
+export function addTodo(text) {
   return {
-    type: INCREMENT,
-    index: index
+    type: ADD_TODO,
+    text
   };
 }
 
-export function decrement(index) {
+export function completeTodo(index) {
   return {
-    type: DECREMENT,
-    index: index
+    type: COMPLETE_TODO,
+    index
   };
 }
 
-export function keyUp(keyCode) {
+export function setVisibilityFilter(filter) {
   return {
-    type: KEY_UP,
-    keyCode: keyCode
+    type: SET_VISIBILITY_FILTER,
+    filter
   };
 }
