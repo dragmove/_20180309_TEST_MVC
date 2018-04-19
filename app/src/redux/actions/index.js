@@ -1,22 +1,22 @@
-import { ADD_TODO, COMPLETE_TODO, SET_VISIBILITY_FILTER } from './actionTypes';
+import {ADD_TODO, COMPLETE_TODO, SET_VISIBILITY_FILTER} from './actionTypes';
 
 export function addTodo(text) {
   return {
     type: ADD_TODO,
-    text
+    text: text
   };
 }
 
 export function completeTodo(index) {
   return {
     type: COMPLETE_TODO,
-    index
+    index: index
   };
 }
 
 export function setVisibilityFilter(filter) {
   return {
     type: SET_VISIBILITY_FILTER,
-    filter
+    filter: filter
   };
 }

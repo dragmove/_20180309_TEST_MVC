@@ -1,10 +1,14 @@
 import $ from 'jquery';
 
-import { createStore, combineReducers } from 'redux';
-import { state } from './redux/state';
-import { visibilityFilter, todos } from './redux/reducers';
-import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions';
+import { createStore } from 'redux';
+import { state } from './redux/state/state';
+// import { state } from './redux/state';
+// import { visibilityFilter, todos } from './redux/reducers';
+// import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions';
 
+import reducers from './redux/reducers/index';
+import { VisibilityFilters } from './redux/actions/index';
+import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/index';
 
 import Backbone from 'backbone';
 import _ from 'underscore';
@@ -27,14 +31,15 @@ import Rx from 'rxjs/Rx';
   }
 
   function testRedux() {
-    const todoAppReducer = combineReducers({
-      visibilityFilter,
-      todos
-    });
+    const VisibilityFilters = {
+      SHOW_ALL: 'SHOW_ALL',
+      SHOW_COMPLETE: 'SHOW_COMPLETE',
+      SHOW_ACTIVE: 'SHOW_ACTIVE'
+    };
 
-    let store = createStore(todoAppReducer);
+    const initialState = Object.assign({}, state);
 
-    console.log('store.getState() :', store.getState());
+    let store = createStore(reducers, initialState);
 
     let unsubscribeStore = store.subscribe(() => {
       console.log('store.getState() :', store.getState());
@@ -46,6 +51,12 @@ import Rx from 'rxjs/Rx';
     store.dispatch(addTodo('Learn about action'));
     store.dispatch(addTodo('Learn about reducers'));
     store.dispatch(addTodo('Learn about store'));
+
+    store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_ACTIVE));
+    store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETE));
+
+    store.dispatch(completeTodo(0));
+    store.dispatch(completeTodo(1));
   }
 
   function testRxJS() {
