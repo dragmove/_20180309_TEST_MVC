@@ -1,10 +1,9 @@
 import $ from 'jquery';
 
-import { createStore } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import { createStore, applyMiddleware } from 'redux';
+import { selectReddit, fetchPosts } from './redux/actions/reddits';
 import { state } from './redux/state/state';
-// import { state } from './redux/state';
-// import { visibilityFilter, todos } from './redux/reducers';
-// import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions';
 
 import reducers from './redux/reducers/index';
 import { VisibilityFilters } from './redux/actions/index';
@@ -31,6 +30,20 @@ import Rx from 'rxjs/Rx';
   }
 
   function testRedux() {
+    const initialState = Object.assign({}, state);
+
+    const createStoreWithMiddleware = applyMiddleware(thunkMiddleware)(createStore);
+    const store = createStoreWithMiddleware(reducers, initialState);
+
+    let unsubscribeStore = store.subscribe(() => {
+      console.log('store.getState() :', store.getState());
+
+      // render view
+    });
+
+    store.dispatch(selectReddit('reactjs'));
+
+    /*
     const VisibilityFilters = {
       SHOW_ALL: 'SHOW_ALL',
       SHOW_COMPLETE: 'SHOW_COMPLETE',
@@ -57,6 +70,7 @@ import Rx from 'rxjs/Rx';
 
     store.dispatch(completeTodo(0));
     store.dispatch(completeTodo(1));
+    */
   }
 
   function testRxJS() {
