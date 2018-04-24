@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-import thunkMiddleware from 'redux-thunk';
+import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { selectReddit, fetchPosts } from './redux/actions/reddits';
@@ -37,7 +37,7 @@ import Rx from 'rxjs/Rx';
     const logger = createLogger(/* options */);
 
     const createStoreWithMiddleware = applyMiddleware(
-      thunkMiddleware,
+      thunk,
       logger
     )(createStore);
     const store = createStoreWithMiddleware(
