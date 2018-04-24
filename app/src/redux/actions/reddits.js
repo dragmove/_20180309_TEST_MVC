@@ -64,7 +64,7 @@ export function fetchPosts(reddit) {
 
 export function fetchPostsIfNeeded(reddit) {
   return function(dispatch, getState) {
-    console.log('fetchPostsIfNeeded getState() :', getState());
+    console.log('fetchPostsIfNeeded - getState() :', getState());
 
     if(shouldFetchPosts(getState().reddits, reddit)) {
       return dispatch(fetchPosts(reddit));
