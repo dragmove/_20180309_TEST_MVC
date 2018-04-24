@@ -43,8 +43,6 @@ export function fetchPosts(reddit) {
         return response.json();
       })
       .then(json => {
-        console.log('reddit, json :', reddit, json);
-
         dispatch(receivePosts(reddit, json));
       })
       .catch(function(error) {

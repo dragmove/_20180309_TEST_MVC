@@ -1,7 +1,8 @@
 import $ from 'jquery';
 
 import thunkMiddleware from 'redux-thunk';
-import { createStore, applyMiddleware } from 'redux';
+import { createLogger } from 'redux-logger';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { selectReddit, fetchPosts } from './redux/actions/reddits';
 import { state } from './redux/state/state';
 
@@ -32,8 +33,18 @@ import Rx from 'rxjs/Rx';
   function testRedux() {
     const initialState = Object.assign({}, state);
 
-    const createStoreWithMiddleware = applyMiddleware(thunkMiddleware)(createStore);
-    const store = createStoreWithMiddleware(reducers, initialState);
+    // can make custom logger middleware
+    const logger = createLogger(/* options */);
+
+    const createStoreWithMiddleware = applyMiddleware(
+      thunkMiddleware,
+      logger
+    )(createStore);
+    const store = createStoreWithMiddleware(
+      reducers,
+      initialState,
+      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    );
 
     let unsubscribeStore = store.subscribe(() => {
       console.log('store.getState() :', store.getState());
@@ -41,8 +52,10 @@ import Rx from 'rxjs/Rx';
       // render view
     });
 
-    // store.dispatch(selectReddit('reactjs'));
-    store.dispatch(fetchPosts('javascript'));
+    store.dispatch(selectReddit('reactjs'));
+    store.dispatch(fetchPosts('javascript')).then(() => {
+      console.log('state after create fetchPosts action :', store.getState());
+    });
 
     /*
     const VisibilityFilters = {
