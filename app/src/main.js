@@ -3,12 +3,11 @@ import $ from 'jquery';
 import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { createStore, applyMiddleware, compose } from 'redux';
-import { selectReddit, fetchPosts } from './redux/actions/reddits';
+import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
 import { state } from './redux/state/state';
 
 import reducers from './redux/reducers/index';
-import { VisibilityFilters } from './redux/actions/index';
-import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/index';
+import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
 
 import Backbone from 'backbone';
 import _ from 'underscore';
@@ -40,6 +39,7 @@ import Rx from 'rxjs/Rx';
       thunk,
       logger
     )(createStore);
+
     const store = createStoreWithMiddleware(
       reducers,
       initialState,
@@ -53,8 +53,13 @@ import Rx from 'rxjs/Rx';
     });
 
     store.dispatch(selectReddit('reactjs'));
+
     store.dispatch(fetchPosts('javascript')).then(() => {
       console.log('state after create fetchPosts action :', store.getState());
+    });
+
+    store.dispatch(fetchPostsIfNeeded('reactjs')).then(() => {
+      console.log('state after create fetchPostsIfNeeded action :', store.getState());
     });
 
     /*

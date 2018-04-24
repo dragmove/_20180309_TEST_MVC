@@ -36,7 +36,7 @@ export const state = {
 
     postsByReddit: {
       frontend: {
-        isFetching: true,
+        isFetching: false,
         didInvalidate: false,
         items: []
       },
