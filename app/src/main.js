@@ -41,7 +41,8 @@ import Rx from 'rxjs/Rx';
       // render view
     });
 
-    store.dispatch(selectReddit('reactjs'));
+    // store.dispatch(selectReddit('reactjs'));
+    store.dispatch(fetchPosts('javascript'));
 
     /*
     const VisibilityFilters = {

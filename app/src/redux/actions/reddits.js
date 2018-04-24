@@ -1,5 +1,5 @@
 import {SELECT_REDDIT, INVALIDATE_REDDIT, REQUEST_POSTS, RECEIVE_POSTS} from './actionTypes';
-import fetch from 'whatwg-fetch';
+import 'whatwg-fetch';
 
 export function selectReddit(reddit) {
   return {
@@ -39,8 +39,12 @@ export function fetchPosts(reddit) {
     dispatch(requestPosts(reddit));
 
     return fetch(`http://www.reddit.com/r/${reddit}.json`)
-      .then(response => response.json)
+      .then(response => {
+        return response.json();
+      })
       .then(json => {
+        console.log('reddit, json :', reddit, json);
+
         dispatch(receivePosts(reddit, json));
       })
       .catch(function(error) {

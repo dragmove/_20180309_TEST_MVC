@@ -4,7 +4,7 @@ const path = require('path'),
 
 module.exports = {
   entry: {
-    main: ['./app/src/main.js']
+    main: ['whatwg-fetch', './app/src/main.js']
   },
 
   output: {
