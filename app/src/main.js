@@ -36,11 +36,13 @@ import Rx from 'rxjs/Rx';
     const logger = createLogger(/* options */);
 
     const customMiddleware = store => next => action => {
+      console.group();
       console.log('[this is customMiddleware] start');
 
       const result = next(action);
 
       console.log('[this is customMiddleware] end');
+      console.groupEnd();
 
       return result;
     };
