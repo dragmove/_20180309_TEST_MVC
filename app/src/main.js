@@ -35,9 +35,20 @@ import Rx from 'rxjs/Rx';
     // can make custom logger middleware
     const logger = createLogger(/* options */);
 
+    const customMiddleware = store => next => action => {
+      console.log('[this is customMiddleware] start');
+
+      const result = next(action);
+
+      console.log('[this is customMiddleware] end');
+
+      return result;
+    };
+
     const createStoreWithMiddleware = applyMiddleware(
       thunk,
-      logger
+      logger,
+      customMiddleware
     )(createStore);
 
     const store = createStoreWithMiddleware(
@@ -63,33 +74,33 @@ import Rx from 'rxjs/Rx';
     });
 
     /*
-    const VisibilityFilters = {
-      SHOW_ALL: 'SHOW_ALL',
-      SHOW_COMPLETE: 'SHOW_COMPLETE',
-      SHOW_ACTIVE: 'SHOW_ACTIVE'
-    };
+     const VisibilityFilters = {
+     SHOW_ALL: 'SHOW_ALL',
+     SHOW_COMPLETE: 'SHOW_COMPLETE',
+     SHOW_ACTIVE: 'SHOW_ACTIVE'
+     };
 
-    const initialState = Object.assign({}, state);
+     const initialState = Object.assign({}, state);
 
-    let store = createStore(reducers, initialState);
+     let store = createStore(reducers, initialState);
 
-    let unsubscribeStore = store.subscribe(() => {
-      console.log('store.getState() :', store.getState());
+     let unsubscribeStore = store.subscribe(() => {
+     console.log('store.getState() :', store.getState());
 
-      // render view
-    });
+     // render view
+     });
 
-    // dispatch event
-    store.dispatch(addTodo('Learn about action'));
-    store.dispatch(addTodo('Learn about reducers'));
-    store.dispatch(addTodo('Learn about store'));
+     // dispatch event
+     store.dispatch(addTodo('Learn about action'));
+     store.dispatch(addTodo('Learn about reducers'));
+     store.dispatch(addTodo('Learn about store'));
 
-    store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_ACTIVE));
-    store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETE));
+     store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_ACTIVE));
+     store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETE));
 
-    store.dispatch(completeTodo(0));
-    store.dispatch(completeTodo(1));
-    */
+     store.dispatch(completeTodo(0));
+     store.dispatch(completeTodo(1));
+     */
   }
 
   function testRxJS() {
