@@ -48,5 +48,11 @@ export const state = {
         items: [42, 100]
       }
     }
+  },
+
+  ping: {
+    isPinging: false
   }
+
+  // user: {}
 };

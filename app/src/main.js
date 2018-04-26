@@ -1,6 +1,9 @@
 import $ from 'jquery';
 
-import thunk from 'redux-thunk';
+// import thunk from 'redux-thunk';
+import { delay, mapTo } from 'rxjs/operator';
+import { createEpicMiddleware } from 'redux-observable';
+import { pingEpic } from './redux/epics/ping';
 import { createLogger } from 'redux-logger';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
@@ -8,6 +11,7 @@ import { state } from './redux/state/state';
 
 import reducers from './redux/reducers/index';
 import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
+import { ping, pong } from './redux/actions/ping';
 
 import Backbone from 'backbone';
 import _ from 'underscore';
@@ -32,7 +36,9 @@ import Rx from 'rxjs/Rx';
   function testRedux() {
     const initialState = Object.assign({}, state);
 
-    // can make custom logger middleware
+    // set middlewares
+    const epicMiddleware = createEpicMiddleware(pingEpic);
+
     const logger = createLogger(/* options */);
 
     const customMiddleware = store => next => action => {
@@ -48,7 +54,7 @@ import Rx from 'rxjs/Rx';
     };
 
     const createStoreWithMiddleware = applyMiddleware(
-      thunk,
+      epicMiddleware,
       logger,
       customMiddleware
     )(createStore);
@@ -67,6 +73,10 @@ import Rx from 'rxjs/Rx';
 
     store.dispatch(selectReddit('reactjs'));
 
+    store.dispatch(ping());
+
+    /*
+    // use redux-thunk sample
     store.dispatch(fetchPosts('javascript')).then(() => {
       console.log('state after create fetchPosts action :', store.getState());
     });
@@ -74,6 +84,7 @@ import Rx from 'rxjs/Rx';
     store.dispatch(fetchPostsIfNeeded('reactjs')).then(() => {
       console.log('state after create fetchPostsIfNeeded action :', store.getState());
     });
+    */
 
     /*
      const VisibilityFilters = {
