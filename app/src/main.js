@@ -1,33 +1,46 @@
-import $ from 'jquery';
+// import Backbone from 'backbone';
+// import _ from 'underscore';
 
-// import thunk from 'redux-thunk';
-import { delay, mapTo } from 'rxjs/operator';
-import { createEpicMiddleware } from 'redux-observable';
-import { pingEpic } from './redux/epics/ping';
-import { createLogger } from 'redux-logger';
+// redux
 import { createStore, applyMiddleware, compose } from 'redux';
-import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
+
+// TODO: redux devtools setting
+// https://github.com/reduxjs/redux-devtools/blob/fc1ab01ca16303005b8bd66b60bce085bf1542e5/docs/Walkthrough.md
+
+// state
 import { state } from './redux/state/state';
 
-import reducers from './redux/reducers/index';
-import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
-import { ping, pong } from './redux/actions/ping';
+// middlewares
+// import thunk from 'redux-thunk';
+import { createLogger } from 'redux-logger';
+import { createEpicMiddleware } from 'redux-observable';
 
-import Backbone from 'backbone';
-import _ from 'underscore';
-
+// operators
+// import { delay, mapTo } from 'rxjs/operator';
 import { merge } from 'rxjs/operators';
 import { interval } from 'rxjs/observable/interval';
 import Rx from 'rxjs/Rx';
 
-(function ($) {
+// actions
+import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
+import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
+import { ping, pong } from './redux/actions/ping';
+
+// reducers
+import reducers from './redux/reducers/index';
+
+// epics from redux-observable
+import { pingEpic } from './redux/epics/ping';
+
+// service
+import { ajax } from 'rxjs/Observable/dom/ajax';
+
+(function() {
   'use strict';
 
   init();
 
   function init() {
-    console.log('init');
-
     testRedux();
     // testRxJS();
     // testBackbone();
@@ -35,6 +48,20 @@ import Rx from 'rxjs/Rx';
 
   function testRedux() {
     const initialState = Object.assign({}, state);
+
+    // action creators
+    const fetchUser = username => ({
+      type: 'FETCH_USER',
+      payload: username
+    });
+
+    const fetchUserFulfilled = payload => ({
+      type: 'FETCH_USER_FULFILLED',
+      payload
+    });
+
+    // epic
+    // TODO 'ㅅ')/
 
     // set middlewares
     const epicMiddleware = createEpicMiddleware(pingEpic);
@@ -53,17 +80,9 @@ import Rx from 'rxjs/Rx';
       return result;
     };
 
-    const createStoreWithMiddleware = applyMiddleware(
-      epicMiddleware,
-      logger,
-      customMiddleware
-    )(createStore);
+    const createStoreWithMiddleware = applyMiddleware(epicMiddleware, logger, customMiddleware)(createStore);
 
-    const store = createStoreWithMiddleware(
-      reducers,
-      initialState,
-      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-    );
+    const store = createStoreWithMiddleware(reducers, initialState, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
     let unsubscribeStore = store.subscribe(() => {
       console.log('store.getState() :', store.getState());
@@ -72,7 +91,6 @@ import Rx from 'rxjs/Rx';
     });
 
     store.dispatch(selectReddit('reactjs'));
-
     store.dispatch(ping());
 
     /*
@@ -140,24 +158,27 @@ import Rx from 'rxjs/Rx';
         action$,
         state$,
         dispatch: action => action$.next(action)
-      }
+      };
     }
 
-    const {state$, dispatch} = factory({
-      ADD: (state, action) => {
-        return Object.assign({}, state, {
-          width: action.width,
-          height: action.height
-        });
-      },
+    const { state$, dispatch } = factory(
+      {
+        ADD: (state, action) => {
+          return Object.assign({}, state, {
+            width: action.width,
+            height: action.height
+          });
+        },
 
-      SUBTRACT: (state, action) => {
-        return Object.assign({}, state, {
-          width: action.width,
-          height: action.height
-        });
-      }
-    }, defaultState);
+        SUBTRACT: (state, action) => {
+          return Object.assign({}, state, {
+            width: action.width,
+            height: action.height
+          });
+        }
+      },
+      defaultState
+    );
 
     state$.subscribe(val => {
       console.log('val :', val);
@@ -195,10 +216,10 @@ import Rx from 'rxjs/Rx';
         completed: false
       },
 
-      initialize: function () {
+      initialize: function() {
         console.log('initialize Todo :', this);
 
-        this.on('change', function () {
+        this.on('change', function() {
           console.log('model has changed :', this.attributes);
         });
       }
@@ -213,7 +234,7 @@ import Rx from 'rxjs/Rx';
     });
 
     console.log('todo_2 :', todo_2);
-    console.log('todo_2.get("title") :', todo_2.get("title"));
+    console.log('todo_2.get("title") :', todo_2.get('title'));
     console.log('todo_2.hasChanged() before change :', todo_2.hasChanged());
 
     // set model
@@ -222,15 +243,15 @@ import Rx from 'rxjs/Rx';
     });
 
     console.log('todo_2.hasChanged() after change :', todo_2.hasChanged());
-    console.log('todo_2.hasChanged("title") :', todo_2.hasChanged("title"));
-    console.log('todo_2.hasChanged("completed") :', todo_2.hasChanged("completed"));
+    console.log('todo_2.hasChanged("title") :', todo_2.hasChanged('title'));
+    console.log('todo_2.hasChanged("completed") :', todo_2.hasChanged('completed'));
   }
 
   function testView() {
     // see babkbone.js book 39p
 
     let TodoView = Backbone.View.extend({
-      initialize: function () {
+      initialize: function() {
         this.model.bind('change', _.bind(this.render, this));
       },
 
@@ -245,7 +266,7 @@ import Rx from 'rxjs/Rx';
         'blur .edit': 'close'
       },
 
-      render: function () {
+      render: function() {
         this.$el.html(this.todoTpl(this.model.toJSON()));
 
         this.input = this.$('.edit');
@@ -253,15 +274,15 @@ import Rx from 'rxjs/Rx';
         return this;
       },
 
-      edit: function () {
+      edit: function() {
         console.log('edit');
       },
 
-      close: function () {
+      close: function() {
         console.log('close');
       },
 
-      updateOnEnter: function (event) {
+      updateOnEnter: function(event) {
         console.log('updateOnEnter:', event);
       }
     });
@@ -269,7 +290,7 @@ import Rx from 'rxjs/Rx';
     let ItemView = Backbone.View.extend({
       events: {},
 
-      render: function () {
+      render: function() {
         this.$el.html(this.model.toJSON());
 
         return this;
@@ -277,11 +298,11 @@ import Rx from 'rxjs/Rx';
     });
 
     let ListView = Backbone.View.extend({
-      render: function () {
+      render: function() {
         let items = this.model.get('items');
 
-        _.each(items, function (item) {
-          let itemView = new ItemView({model: item});
+        _.each(items, function(item) {
+          let itemView = new ItemView({ model: item });
           this.$el.append(itemView.render().el);
         });
 
@@ -304,20 +325,20 @@ import Rx from 'rxjs/Rx';
       model: Todo
     });
 
-    let a = new Todo({title: 'go to home', id: 1}),
-      b = new Todo({title: 'go to company', id: 2}),
-      c = new Todo({title: 'go to shop', id: 3});
+    let a = new Todo({ title: 'go to home', id: 1 }),
+      b = new Todo({ title: 'go to company', id: 2 }),
+      c = new Todo({ title: 'go to shop', id: 3 });
 
     var todos = new TodosCollection([a, b]);
-    todos.on('add', function (todo) {
-      console.log('added Todo title :', todo.get('title'))
+    todos.on('add', function(todo) {
+      console.log('added Todo title :', todo.get('title'));
     });
 
-    todos.on('change:title', function (model) {
+    todos.on('change:title', function(model) {
       console.log(`changed Todo model's title :`, model.get('title'));
     });
 
-    todos.on('remove', function (model) {
+    todos.on('remove', function(model) {
       console.log(`removed Todo model's title :`, model.get('title'));
     });
 
@@ -338,4 +359,4 @@ import Rx from 'rxjs/Rx';
 
     // reset, update event
   }
-}($));
+})();

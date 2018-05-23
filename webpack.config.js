@@ -8,7 +8,7 @@ module.exports = {
   },
 
   output: {
-    filename: "[name].js",
+    filename: '[name].js',
     path: path.resolve(dirName, 'app/build')
   },
 
@@ -21,7 +21,7 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              ["env"/*, {
+              ['env' /*, {
                 "modules": false // if you use tree shaking, remove comments. this is core of tree shaking in webpack-dev-server environment. 'ㅅ')!
               }*/]
             ]
