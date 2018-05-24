@@ -47,6 +47,7 @@ import { ajax } from 'rxjs/Observable/dom/ajax';
   }
 
   function testRedux() {
+    // set initial state
     const initialState = Object.assign({}, state);
 
     // action creators
@@ -66,7 +67,7 @@ import { ajax } from 'rxjs/Observable/dom/ajax';
     // set middlewares
     const epicMiddleware = createEpicMiddleware(pingEpic);
 
-    const logger = createLogger(/* options */);
+    const loggerMiddleware = createLogger(/* options */);
 
     const customMiddleware = store => next => action => {
       console.group();
