@@ -25,7 +25,7 @@ import { interval } from 'rxjs/observable/interval';
 import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
 import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
 import { ping, pong } from './redux/actions/ping';
-import { fetchUser, fetchUserFulfilled } from './redux/actions/users';
+import { fetchUser, fetchUserFulfilled, cancelFetchUser } from './redux/actions/users';
 
 // reducers
 import { rootReducer } from './redux/reducers/index'; // todos, visibilityFilter, reddits, ping, users
@@ -75,7 +75,6 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
 
     let unsubscribeStore = store.subscribe(() => {
       console.log('store.getState() :', store.getState());
-
       // render view
     });
 
@@ -86,6 +85,9 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
 
     // redux-observable epic use ajax // https://redux-observable.js.org/docs/basics/Epics.html
     store.dispatch(fetchUser('dragmove'));
+
+    // test cancel ajax from fetchUser action
+    store.dispatch(cancelFetchUser());
 
     /*
     // use redux-thunk sample

@@ -1,4 +1,4 @@
-import {SELECT_REDDIT, INVALIDATE_REDDIT, REQUEST_POSTS, RECEIVE_POSTS} from '../actions/actionTypes';
+import { SELECT_REDDIT, INVALIDATE_REDDIT, REQUEST_POSTS, RECEIVE_POSTS } from '../actions/actionTypes';
 import extend from 'extend';
 
 function selectedReddit(state = 'reactjs', action) {
@@ -12,11 +12,14 @@ function selectedReddit(state = 'reactjs', action) {
   }
 }
 
-function posts(state = {
-  isFetching: false,
-  didInvalidate: false,
-  items: []
-}, action) {
+function posts(
+  state = {
+    isFetching: false,
+    didInvalidate: false,
+    items: []
+  },
+  action
+) {
   switch (action.type) {
     case INVALIDATE_REDDIT:
       return Object.assign({}, state, {
@@ -40,7 +43,7 @@ function posts(state = {
       });
       break;
 
-    default :
+    default:
       return state;
   }
 }
@@ -54,13 +57,13 @@ function postsByReddit(state = {}, action) {
         [action.reddit]: posts(state[action.reddit], action)
       });
 
-    default :
+    default:
       return state;
   }
 }
 
-export const reddits = (state = {selectedReddit: '', entities: {}, postsByReddit: {}}, action) => {
-  console.log('reddits reducer - action :', action);
+export const reddits = (state = { selectedReddit: '', entities: {}, postsByReddit: {} }, action) => {
+  // console.log('reddits reducer - action :', action);
 
   switch (action.type) {
     case SELECT_REDDIT:
@@ -78,4 +81,4 @@ export const reddits = (state = {selectedReddit: '', entities: {}, postsByReddit
     default:
       return state;
   }
-}
+};
