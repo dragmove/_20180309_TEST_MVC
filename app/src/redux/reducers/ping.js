@@ -1,6 +1,6 @@
-import {PING, PONG} from '../actions/actionTypes';
+import { PING, PONG } from '../actions/actionTypes';
 
-export const ping = (state = {isPinging: false}, action) => {
+export const ping = (state = { isPinging: false }, action) => {
   switch (action.type) {
     case PING:
       return {
@@ -16,5 +16,3 @@ export const ping = (state = {isPinging: false}, action) => {
       return state;
   }
 };
-
-export default ping;

@@ -11,3 +11,6 @@ export const RECEIVE_POSTS = 'RECEIVE_POSTS';
 
 export const PING = 'PING';
 export const PONG = 'PONG';
+
+export const FETCH_USER = 'FETCH_USER';
+export const FETCH_USER_FULFILLED = 'FETCH_USER_FULFILLED';

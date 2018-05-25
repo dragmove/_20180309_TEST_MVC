@@ -1,6 +1,6 @@
-import {ADD_TODO, COMPLETE_TODO} from '../actions/actionTypes';
+import { ADD_TODO, COMPLETE_TODO } from '../actions/actionTypes';
 
-const todos = (state = [], action) => {
+export const todos = (state = [], action) => {
   switch (action.type) {
     case ADD_TODO:
       return [
@@ -10,7 +10,7 @@ const todos = (state = [], action) => {
           text: action.text,
           completed: false
         }
-      ]
+      ];
 
     case COMPLETE_TODO:
       return [
@@ -23,8 +23,6 @@ const todos = (state = [], action) => {
       return state;
 
     default:
-      return state
+      return state;
   }
-}
-
-export default todos
+};

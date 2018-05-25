@@ -1,13 +1,16 @@
 export const state = {
   visibilityFilter: 'SHOW_ALL',
 
-  todos: [{
-    text: 'Consider using Redux',
-    completed: false,
-  }, {
-    text: 'Keep all state in a single tree',
-    completed: false
-  }],
+  todos: [
+    {
+      text: 'Consider using Redux',
+      completed: false
+    },
+    {
+      text: 'Keep all state in a single tree',
+      completed: false
+    }
+  ],
 
   reddits: {
     selectedReddit: 'frontend',
@@ -52,7 +55,7 @@ export const state = {
 
   ping: {
     isPinging: false
-  }
+  },
 
-  // user: {}
+  users: {}
 };

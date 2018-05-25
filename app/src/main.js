@@ -17,23 +17,21 @@ import { createEpicMiddleware } from 'redux-observable';
 
 // operators
 // import { delay, mapTo } from 'rxjs/operator';
+import Rx from 'rxjs/Rx';
 import { merge } from 'rxjs/operators';
 import { interval } from 'rxjs/observable/interval';
-import Rx from 'rxjs/Rx';
 
 // actions
 import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
 import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
 import { ping, pong } from './redux/actions/ping';
+import { fetchUser, fetchUserFulfilled } from './redux/actions/users';
 
 // reducers
-import reducers from './redux/reducers/index';
+import { rootReducer } from './redux/reducers/index'; // todos, visibilityFilter, reddits, ping, users
 
 // epics from redux-observable
-import { pingEpic } from './redux/epics/ping';
-
-// service
-import { ajax } from 'rxjs/Observable/dom/ajax';
+import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
 
 (function() {
   'use strict';
@@ -50,40 +48,30 @@ import { ajax } from 'rxjs/Observable/dom/ajax';
     // set initial state
     const initialState = Object.assign({}, state);
 
-    // action creators
-    const fetchUser = username => ({
-      type: 'FETCH_USER',
-      payload: username
-    });
-
-    const fetchUserFulfilled = payload => ({
-      type: 'FETCH_USER_FULFILLED',
-      payload
-    });
-
-    // epic
-    // TODO 'ㅅ')/
-
     // set middlewares
-    const epicMiddleware = createEpicMiddleware(pingEpic);
+    const epicMiddleware = createEpicMiddleware(rootEpic);
 
-    const loggerMiddleware = createLogger(/* options */);
+    const loggerMiddleware = createLogger(/* options */); // TODO: study redux-logger options
 
     const customMiddleware = store => next => action => {
-      console.group();
-      console.log('[this is customMiddleware] start');
+      //   console.group();
+      //   console.log('[this is customMiddleware] start');
 
       const result = next(action);
 
-      console.log('[this is customMiddleware] end');
-      console.groupEnd();
+      //   console.log('[this is customMiddleware] end');
+      //   console.groupEnd();
 
       return result;
     };
 
-    const createStoreWithMiddleware = applyMiddleware(epicMiddleware, logger, customMiddleware)(createStore);
+    const createStoreWithMiddleware = applyMiddleware(epicMiddleware, loggerMiddleware, customMiddleware)(createStore);
 
-    const store = createStoreWithMiddleware(reducers, initialState, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+    const store = createStoreWithMiddleware(
+      rootReducer,
+      initialState,
+      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    );
 
     let unsubscribeStore = store.subscribe(() => {
       console.log('store.getState() :', store.getState());
@@ -91,8 +79,13 @@ import { ajax } from 'rxjs/Observable/dom/ajax';
       // render view
     });
 
+    // test dispatch actions
     store.dispatch(selectReddit('reactjs'));
+
     store.dispatch(ping());
+
+    // redux-observable epic use ajax // https://redux-observable.js.org/docs/basics/Epics.html
+    store.dispatch(fetchUser('dragmove'));
 
     /*
     // use redux-thunk sample
@@ -114,7 +107,7 @@ import { ajax } from 'rxjs/Observable/dom/ajax';
 
      const initialState = Object.assign({}, state);
 
-     let store = createStore(reducers, initialState);
+     let store = createStore(rootReducer, initialState);
 
      let unsubscribeStore = store.subscribe(() => {
      console.log('store.getState() :', store.getState());
