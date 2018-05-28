@@ -84,10 +84,11 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
     store.dispatch(ping());
 
     // redux-observable epic use ajax // https://redux-observable.js.org/docs/basics/Epics.html
-    store.dispatch(fetchUser('dragmove'));
+    // store.dispatch(fetchUser('dragmove'));
+    store.dispatch(fetchUser('-1'));
 
     // test cancel ajax from fetchUser action
-    store.dispatch(cancelFetchUser());
+    // store.dispatch(cancelFetchUser());
 
     /*
     // use redux-thunk sample
