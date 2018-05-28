@@ -15,10 +15,7 @@
     "build": "webpack --config webpack.config.js"
   },
   "author": "Hyun-Seok.Kim",
-  "license": {
-    "type": "MIT",
-    "url": "https://opensource.org/licenses/mit-license.php"
-  },
+  "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
