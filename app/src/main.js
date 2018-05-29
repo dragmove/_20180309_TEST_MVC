@@ -1,13 +1,13 @@
 // import Backbone from 'backbone';
 // import _ from 'underscore';
 
-// redux
+// # redux
 import { createStore, applyMiddleware, compose } from 'redux';
 
 // TODO: redux devtools setting
 // https://github.com/reduxjs/redux-devtools/blob/fc1ab01ca16303005b8bd66b60bce085bf1542e5/docs/Walkthrough.md
 
-// state
+// + state
 import { state } from './redux/state/state';
 
 // middlewares
@@ -15,84 +15,92 @@ import { state } from './redux/state/state';
 import { createLogger } from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 
-// operators
+// + operators
 // import { delay, mapTo } from 'rxjs/operator';
 import Rx from 'rxjs/Rx';
 import { merge } from 'rxjs/operators';
 import { interval } from 'rxjs/observable/interval';
 
-// actions
+// + actions
 import { addTodo, completeTodo, setVisibilityFilter } from './redux/actions/todos';
 import { selectReddit, fetchPosts, fetchPostsIfNeeded } from './redux/actions/reddits';
 import { ping, pong } from './redux/actions/ping';
 import { fetchUser, fetchUserFulfilled, cancelFetchUser } from './redux/actions/users';
 
-// reducers
+// + reducers
 import { rootReducer } from './redux/reducers/index'; // todos, visibilityFilter, reddits, ping, users
 
-// epics from redux-observable
+// + epics from redux-observable
+import { ajax } from 'rxjs/Observable/dom/ajax'; // inject dependencies to epic middleware
 import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
 
 (function() {
-  'use strict';
+    'use strict';
 
-  init();
+    init();
 
-  function init() {
-    testRedux();
-    // testRxJS();
-    // testBackbone();
-  }
+    function init() {
+        testRedux();
+        // testRxJS();
+        // testBackbone();
+    }
 
-  function testRedux() {
-    // set initial state
-    const initialState = Object.assign({}, state);
+    function testRedux() {
+        // + set initial state
+        const initialState = Object.assign({}, state);
 
-    // set middlewares
-    const epicMiddleware = createEpicMiddleware(rootEpic);
+        // + set middlewares
+        // set epicMiddleware(redux-observable) and inject dependencies.
+        const epicMiddleware = createEpicMiddleware(rootEpic, {
+            dependencies: {
+                getJSON: ajax.getJSON
+            }
+        });
 
-    const loggerMiddleware = createLogger(/* options */); // TODO: study redux-logger options
+        const loggerMiddleware = createLogger(/* options */); // TODO: study redux-logger options
 
-    const customMiddleware = store => next => action => {
-      //   console.group();
-      //   console.log('[this is customMiddleware] start');
+        const customMiddleware = store => next => action => {
+            //   console.group();
+            //   console.log('[this is customMiddleware] start');
 
-      const result = next(action);
+            const result = next(action);
 
-      //   console.log('[this is customMiddleware] end');
-      //   console.groupEnd();
+            //   console.log('[this is customMiddleware] end');
+            //   console.groupEnd();
 
-      return result;
-    };
+            return result;
+        };
 
-    const createStoreWithMiddleware = applyMiddleware(epicMiddleware, loggerMiddleware, customMiddleware)(createStore);
+        const createStoreWithMiddleware = applyMiddleware(epicMiddleware, loggerMiddleware, customMiddleware)(
+            createStore
+        );
 
-    const store = createStoreWithMiddleware(
-      rootReducer,
-      initialState,
-      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-    );
+        const store = createStoreWithMiddleware(
+            rootReducer,
+            initialState,
+            window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+        );
 
-    let unsubscribeStore = store.subscribe(() => {
-      console.log('store.getState() :', store.getState());
-      // render view
-    });
+        let unsubscribeStore = store.subscribe(() => {
+            console.log('store.getState() :', store.getState());
+            // render view
+        });
 
-    // test dispatch actions
-    store.dispatch(selectReddit('reactjs'));
+        // test dispatch actions
+        store.dispatch(selectReddit('reactjs'));
 
-    store.dispatch(ping());
+        store.dispatch(ping());
 
-    // redux-observable epic use ajax // https://redux-observable.js.org/docs/basics/Epics.html
-    // store.dispatch(fetchUser('dragmove'));
+        // redux-observable epic use ajax // https://redux-observable.js.org/docs/basics/Epics.html
+        // store.dispatch(fetchUser('dragmove'));
 
-    // test cancel ajax from fetchUser action
-    // store.dispatch(cancelFetchUser());
+        // test cancel ajax from fetchUser action
+        // store.dispatch(cancelFetchUser());
 
-    // redux-observable error handling // https://redux-observable.js.org/docs/recipes/ErrorHandling.html
-    store.dispatch(fetchUser('-1'));
+        // redux-observable error handling // https://redux-observable.js.org/docs/recipes/ErrorHandling.html
+        store.dispatch(fetchUser('-1'));
 
-    /*
+        /*
     // use redux-thunk sample
     store.dispatch(fetchPosts('javascript')).then(() => {
       console.log('state after create fetchPosts action :', store.getState());
@@ -103,7 +111,7 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
     });
     */
 
-    /*
+        /*
      const VisibilityFilters = {
      SHOW_ALL: 'SHOW_ALL',
      SHOW_COMPLETE: 'SHOW_COMPLETE',
@@ -131,231 +139,231 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
      store.dispatch(completeTodo(0));
      store.dispatch(completeTodo(1));
      */
-  }
-
-  function testRxJS() {
-    // test RxJS Subject. subscribe change state by action (redux)
-
-    const defaultState = {
-      width: 0,
-      height: 0
-    };
-
-    function factory(reducerByType, initialState) {
-      const action$ = new Rx.Subject();
-
-      const state$ = action$
-        .startWith(initialState)
-        .scan((state, action) => {
-          if (reducerByType.hasOwnProperty(action.type)) return reducerByType[action.type](state, action);
-
-          return state;
-        })
-        .distinctUntilChanged();
-
-      return {
-        action$,
-        state$,
-        dispatch: action => action$.next(action)
-      };
     }
 
-    const { state$, dispatch } = factory(
-      {
-        ADD: (state, action) => {
-          return Object.assign({}, state, {
-            width: action.width,
-            height: action.height
-          });
-        },
+    function testRxJS() {
+        // test RxJS Subject. subscribe change state by action (redux)
 
-        SUBTRACT: (state, action) => {
-          return Object.assign({}, state, {
-            width: action.width,
-            height: action.height
-          });
+        const defaultState = {
+            width: 0,
+            height: 0
+        };
+
+        function factory(reducerByType, initialState) {
+            const action$ = new Rx.Subject();
+
+            const state$ = action$
+                .startWith(initialState)
+                .scan((state, action) => {
+                    if (reducerByType.hasOwnProperty(action.type)) return reducerByType[action.type](state, action);
+
+                    return state;
+                })
+                .distinctUntilChanged();
+
+            return {
+                action$,
+                state$,
+                dispatch: action => action$.next(action)
+            };
         }
-      },
-      defaultState
-    );
 
-    state$.subscribe(val => {
-      console.log('val :', val);
-    });
+        const { state$, dispatch } = factory(
+            {
+                ADD: (state, action) => {
+                    return Object.assign({}, state, {
+                        width: action.width,
+                        height: action.height
+                    });
+                },
 
-    dispatch({
-      type: 'ADD',
-      width: 10,
-      height: 20
-    });
+                SUBTRACT: (state, action) => {
+                    return Object.assign({}, state, {
+                        width: action.width,
+                        height: action.height
+                    });
+                }
+            },
+            defaultState
+        );
 
-    dispatch({
-      type: 'SUBTRACT',
-      width: 15,
-      height: 20
-    });
+        state$.subscribe(val => {
+            console.log('val :', val);
+        });
 
-    /*
+        dispatch({
+            type: 'ADD',
+            width: 10,
+            height: 20
+        });
+
+        dispatch({
+            type: 'SUBTRACT',
+            width: 15,
+            height: 20
+        });
+
+        /*
      const source$ = Rx.Observable.fromEvent(window, 'resize');
      const debounce$ = source$.debounceTime(1000);
      const subscribe$ = debounce$.subscribe(val => console.log(val));
      */
-  }
+    }
 
-  function testBackbone() {
-    testModel();
-    testView();
-    testCollection();
-  }
+    function testBackbone() {
+        testModel();
+        testView();
+        testCollection();
+    }
 
-  function testModel() {
-    let Todo = Backbone.Model.extend({
-      defaults: {
-        title: '',
-        completed: false
-      },
+    function testModel() {
+        let Todo = Backbone.Model.extend({
+            defaults: {
+                title: '',
+                completed: false
+            },
 
-      initialize: function() {
-        console.log('initialize Todo :', this);
+            initialize: function() {
+                console.log('initialize Todo :', this);
 
-        this.on('change', function() {
-          console.log('model has changed :', this.attributes);
-        });
-      }
-    });
-
-    let todo_1 = new Todo();
-    console.log('todo_1 :', todo_1);
-
-    let todo_2 = new Todo({
-      title: 'hello model',
-      completed: true
-    });
-
-    console.log('todo_2 :', todo_2);
-    console.log('todo_2.get("title") :', todo_2.get('title'));
-    console.log('todo_2.hasChanged() before change :', todo_2.hasChanged());
-
-    // set model
-    todo_2.set({
-      title: 'changed title'
-    });
-
-    console.log('todo_2.hasChanged() after change :', todo_2.hasChanged());
-    console.log('todo_2.hasChanged("title") :', todo_2.hasChanged('title'));
-    console.log('todo_2.hasChanged("completed") :', todo_2.hasChanged('completed'));
-  }
-
-  function testView() {
-    // see babkbone.js book 39p
-
-    let TodoView = Backbone.View.extend({
-      initialize: function() {
-        this.model.bind('change', _.bind(this.render, this));
-      },
-
-      tagName: 'li',
-
-      todoTpl: _.template('An example template'),
-
-      events: {
-        'click .toggle': 'toggleCompleted',
-        'dbclick label': 'edit',
-        'keypress .edit': 'updateOnEnter',
-        'blur .edit': 'close'
-      },
-
-      render: function() {
-        this.$el.html(this.todoTpl(this.model.toJSON()));
-
-        this.input = this.$('.edit');
-
-        return this;
-      },
-
-      edit: function() {
-        console.log('edit');
-      },
-
-      close: function() {
-        console.log('close');
-      },
-
-      updateOnEnter: function(event) {
-        console.log('updateOnEnter:', event);
-      }
-    });
-
-    let ItemView = Backbone.View.extend({
-      events: {},
-
-      render: function() {
-        this.$el.html(this.model.toJSON());
-
-        return this;
-      }
-    });
-
-    let ListView = Backbone.View.extend({
-      render: function() {
-        let items = this.model.get('items');
-
-        _.each(items, function(item) {
-          let itemView = new ItemView({ model: item });
-          this.$el.append(itemView.render().el);
+                this.on('change', function() {
+                    console.log('model has changed :', this.attributes);
+                });
+            }
         });
 
-        this.$el.html(this.model.toJSON());
+        let todo_1 = new Todo();
+        console.log('todo_1 :', todo_1);
 
-        return this;
-      }
-    });
-  }
+        let todo_2 = new Todo({
+            title: 'hello model',
+            completed: true
+        });
 
-  function testCollection() {
-    let Todo = Backbone.Model.extend({
-      default: {
-        title: '',
-        completed: false
-      }
-    });
+        console.log('todo_2 :', todo_2);
+        console.log('todo_2.get("title") :', todo_2.get('title'));
+        console.log('todo_2.hasChanged() before change :', todo_2.hasChanged());
 
-    let TodosCollection = Backbone.Collection.extend({
-      model: Todo
-    });
+        // set model
+        todo_2.set({
+            title: 'changed title'
+        });
 
-    let a = new Todo({ title: 'go to home', id: 1 }),
-      b = new Todo({ title: 'go to company', id: 2 }),
-      c = new Todo({ title: 'go to shop', id: 3 });
+        console.log('todo_2.hasChanged() after change :', todo_2.hasChanged());
+        console.log('todo_2.hasChanged("title") :', todo_2.hasChanged('title'));
+        console.log('todo_2.hasChanged("completed") :', todo_2.hasChanged('completed'));
+    }
 
-    var todos = new TodosCollection([a, b]);
-    todos.on('add', function(todo) {
-      console.log('added Todo title :', todo.get('title'));
-    });
+    function testView() {
+        // see babkbone.js book 39p
 
-    todos.on('change:title', function(model) {
-      console.log(`changed Todo model's title :`, model.get('title'));
-    });
+        let TodoView = Backbone.View.extend({
+            initialize: function() {
+                this.model.bind('change', _.bind(this.render, this));
+            },
 
-    todos.on('remove', function(model) {
-      console.log(`removed Todo model's title :`, model.get('title'));
-    });
+            tagName: 'li',
 
-    todos.add(c);
-    console.log('after add new Todo, todos.length :', todos.length);
+            todoTpl: _.template('An example template'),
 
-    let todo_2 = todos.get(2);
-    console.log('todo_2 :', todo_2);
+            events: {
+                'click .toggle': 'toggleCompleted',
+                'dbclick label': 'edit',
+                'keypress .edit': 'updateOnEnter',
+                'blur .edit': 'close'
+            },
 
-    todo_2.set('title', 'go fishing');
+            render: function() {
+                this.$el.html(this.todoTpl(this.model.toJSON()));
 
-    let todoCid = todos.get(todo_2.cid);
-    console.log('todoCid :', todoCid);
-    console.log('todoCid === b :', todoCid === b);
+                this.input = this.$('.edit');
 
-    todos.remove([a, b]);
-    console.log('todos.length :', todos.length);
+                return this;
+            },
 
-    // reset, update event
-  }
+            edit: function() {
+                console.log('edit');
+            },
+
+            close: function() {
+                console.log('close');
+            },
+
+            updateOnEnter: function(event) {
+                console.log('updateOnEnter:', event);
+            }
+        });
+
+        let ItemView = Backbone.View.extend({
+            events: {},
+
+            render: function() {
+                this.$el.html(this.model.toJSON());
+
+                return this;
+            }
+        });
+
+        let ListView = Backbone.View.extend({
+            render: function() {
+                let items = this.model.get('items');
+
+                _.each(items, function(item) {
+                    let itemView = new ItemView({ model: item });
+                    this.$el.append(itemView.render().el);
+                });
+
+                this.$el.html(this.model.toJSON());
+
+                return this;
+            }
+        });
+    }
+
+    function testCollection() {
+        let Todo = Backbone.Model.extend({
+            default: {
+                title: '',
+                completed: false
+            }
+        });
+
+        let TodosCollection = Backbone.Collection.extend({
+            model: Todo
+        });
+
+        let a = new Todo({ title: 'go to home', id: 1 }),
+            b = new Todo({ title: 'go to company', id: 2 }),
+            c = new Todo({ title: 'go to shop', id: 3 });
+
+        var todos = new TodosCollection([a, b]);
+        todos.on('add', function(todo) {
+            console.log('added Todo title :', todo.get('title'));
+        });
+
+        todos.on('change:title', function(model) {
+            console.log(`changed Todo model's title :`, model.get('title'));
+        });
+
+        todos.on('remove', function(model) {
+            console.log(`removed Todo model's title :`, model.get('title'));
+        });
+
+        todos.add(c);
+        console.log('after add new Todo, todos.length :', todos.length);
+
+        let todo_2 = todos.get(2);
+        console.log('todo_2 :', todo_2);
+
+        todo_2.set('title', 'go fishing');
+
+        let todoCid = todos.get(todo_2.cid);
+        console.log('todoCid :', todoCid);
+        console.log('todoCid === b :', todoCid === b);
+
+        todos.remove([a, b]);
+        console.log('todos.length :', todos.length);
+
+        // reset, update event
+    }
 })();
