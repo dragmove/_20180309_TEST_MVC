@@ -4,8 +4,9 @@
 // # redux
 import { createStore, applyMiddleware, compose } from 'redux';
 
-// TODO: redux devtools setting
-// https://github.com/reduxjs/redux-devtools/blob/fc1ab01ca16303005b8bd66b60bce085bf1542e5/docs/Walkthrough.md
+// + redux devtools setting
+// require install chrome extension.
+// https://github.com/zalmoxisus/redux-devtools-extension
 
 // + state
 import { state } from './redux/state/state';
@@ -209,6 +210,7 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
      */
   }
 
+  /*
   function testBackbone() {
     testModel();
     testView();
@@ -365,4 +367,5 @@ import { rootEpic } from './redux/epics/index'; // pingEpic, fetchUserEpic
 
     // reset, update event
   }
+  */
 })();

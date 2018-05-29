@@ -31,7 +31,9 @@ Backbone 의 뷰는 컨트롤러의 로직을 가지고 있고, 라우터(router
 
 ## Redux
 
-Working
+redux + redux-thunk 테스트 후, 사용하지 않는 것으로 정리.
+이후, redux + redux-observable 조합 실습으로 코드 정리. // 20180529
+
 
 ## Contact
 
